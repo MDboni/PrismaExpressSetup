@@ -1,0 +1,11 @@
+// Entry point for the multi-file Prisma schema.
+// Models and enums are defined in the other .prisma files in this folder.
+
+generator client {
+  provider = "prisma-client"
+  output   = "generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}

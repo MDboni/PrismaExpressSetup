@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
-import config from "../config";
 import { Prisma } from "../../../prisma/generated/prisma/client";
+import config from "../config";
 
 export const globalErrorHandler = async (
 	err: any,

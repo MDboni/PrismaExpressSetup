@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import type { JwtPayload } from "jsonwebtoken";
-import { Role } from "../../../prisma/generated/prisma/enums";
+import type { Role } from "../../../prisma/generated/prisma/enums";
 import config from "../config";
 import { prisma } from "../lib/prisma";
 import { catchAsync } from "../utils/catchAsync";

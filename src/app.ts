@@ -6,9 +6,9 @@ import express, {
 	type Response,
 } from "express";
 import httpStatus from "http-status";
+import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
-import config from "./app/config";
 import { AuthRoutes } from "./app/module/auth/auth.route";
 
 const app: Application = express();

@@ -11,7 +11,6 @@ import { notFound } from "./app/middleware/notFound";
 import config from "./app/config";
 import { AuthRoutes } from "./app/module/auth/auth.route";
 
-
 const app: Application = express();
 
 app.use(

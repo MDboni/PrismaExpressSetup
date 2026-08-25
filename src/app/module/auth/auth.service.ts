@@ -3,9 +3,9 @@ import bcrypt from "bcrypt";
 import type { TokenPayload } from "google-auth-library";
 import type { JwtPayload, SignOptions } from "jsonwebtoken";
 import {
-  AuthProvider,
-  Role,
-  UserStatus,
+	AuthProvider,
+	Role,
+	UserStatus,
 } from "../../../../prisma/generated/prisma/enums";
 import config from "../../config";
 import { googleClient } from "../../lib/googleAuth";

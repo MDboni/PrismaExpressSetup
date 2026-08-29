@@ -19,7 +19,7 @@ import type {
 } from "./auth.interface";
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
-	const { name, password , patient : patientData } = payload;
+	const { name, password, patient: patientData } = payload;
 	const email = payload.email.trim().toLowerCase();
 
 	const isUserExists = await prisma.user.findUnique({
@@ -293,6 +293,7 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 						create: {
 							name: googleIdTokenPayload.name,
 							email: googleIdTokenPayload.email,
+							age: 0, // Default age, can be updated later
 						},
 					},
 				},

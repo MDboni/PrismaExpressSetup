@@ -15,4 +15,15 @@ export default {
 	jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN!,
 	jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN!,
 	google_client_id: process.env.GOOGLE_CLIENT_ID!,
+	SUPER_ADMIN_NAME: process.env.SUPER_ADMIN_NAME!,
+	SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL!,
+	SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD!,
+
+	tester_admin_name: process.env.TESTER_ADMIN_NAME!,
+	tester_admin_email: process.env.TESTER_ADMIN_EMAIL!,
+	tester_admin_password: process.env.TESTER_ADMIN_PASSWORD!,
+
+	tester_doctor_name: process.env.TESTER_DOCTOR_NAME!,
+	tester_doctor_email: process.env.TESTER_DOCTOR_EMAIL!,
+	tester_doctor_password: process.env.TESTER_DOCTOR_PASSWORD!,
 };

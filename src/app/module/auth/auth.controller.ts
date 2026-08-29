@@ -4,23 +4,11 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import type { IRequestUser } from "./auth.interface";
 import { AuthService } from "./auth.service";
-import { z } from "zod";
-
-const PatientRegistration = z.object({
-	name: z.string().min(2).max(100),
-	email: z.email(),
-	password: z.string().min(6).max(100)
-	          .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
-	patient: z.object({
-		contactNumber: z.string().optional(),
-		age: z.number().min(0),
-	}),
-});
+import { PatientRegistration } from "./auth.validation";
 
 const registerPatient = catchAsync(async (req: Request, res: Response) => {
 	const payload = PatientRegistration.safeParse(req.body);
 
-		
 	if (!payload.success) {
 		let errorMessage = "";
 		payload.error.issues.forEach((error) => {

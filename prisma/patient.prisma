@@ -4,6 +4,7 @@ model Patient {
   name          String
   email         String    @unique
   contactNumber String?
+  age           Int
   address       String?
   isDeleted     Boolean   @default(false)
   deletedAt     DateTime?

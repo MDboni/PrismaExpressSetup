@@ -41,7 +41,12 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
 			status: UserStatus.ACTIVE,
 			emailVerified: false,
 			patient: {
-				create: { name, email, contactNumber: patientData.contactNumber },
+				create: {
+					name,
+					email,
+					contactNumber: patientData.contactNumber,
+					age: patientData.age,
+				},
 			},
 		},
 		omit: { password: true },

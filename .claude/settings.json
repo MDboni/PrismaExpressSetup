@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(grep -v \"SECURITY WARNING\\\\|^In the next\\\\|^To prepare\\\\|^- If you\\\\|^See https\\\\|^\\(Use .node\\\\|^$\")"
+    ]
+  }
+}

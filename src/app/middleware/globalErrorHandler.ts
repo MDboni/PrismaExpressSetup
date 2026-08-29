@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import { Prisma } from "../../../prisma/generated/prisma/client";
 import config from "../config";
+import { AppError } from "../utils/AppError";
 
 export const globalErrorHandler = async (
 	err: any,
@@ -18,7 +19,15 @@ export const globalErrorHandler = async (
 	const errorName = err.name || "Internal Server Error";
 	// let errorDetails = err.stack
 
-	if (err instanceof Prisma.PrismaClientValidationError) {
+	// Errors we raise ourselves carry a message meant for the client, so it stays
+	// visible in production. Everything else is masked outside development.
+	let isSafeMessage = false;
+
+	if (err instanceof AppError) {
+		statusCode = err.statusCode;
+		errorMessage = err.message;
+		isSafeMessage = true;
+	} else if (err instanceof Prisma.PrismaClientValidationError) {
 		statusCode = httpStatus.BAD_REQUEST;
 		errorMessage = "You have provided incorrect field type or missing fields";
 	} else if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -49,13 +58,13 @@ export const globalErrorHandler = async (
 		errorMessage = err.message;
 	}
 
-	res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+	res.status(statusCode).json({
 		success: false,
 		statusCode: statusCode || httpStatus.INTERNAL_SERVER_ERROR,
 		name:
 			config.node_env === "development" ? errorName : "Internal Server Error",
 		message:
-			config.node_env === "development"
+			config.node_env === "development" || isSafeMessage
 				? errorMessage
 				: "Internal Server Error",
 		error: config.node_env === "development" ? err : undefined,

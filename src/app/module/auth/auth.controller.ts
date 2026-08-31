@@ -5,7 +5,6 @@ import { sendResponse } from "../../utils/sendResponse";
 import type { IRequestUser } from "./auth.interface";
 import { AuthService } from "./auth.service";
 
-
 const registerPatient = catchAsync(async (req: Request, res: Response) => {
 	// const payload = PatientRegistration.safeParse(req.body);
 
@@ -17,7 +16,7 @@ const registerPatient = catchAsync(async (req: Request, res: Response) => {
 	// 	throw new Error(errorMessage);
 	// }
 
-	const payload = req.body ;
+	const payload = req.body;
 
 	const result = await AuthService.registerPatient(payload);
 
@@ -163,7 +162,7 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
 		success: true,
-		message: "OTP sent to email successfully",
+		message: `OTP Sent To Email : ${payload.email}`,
 		data: null,
 	});
 });
@@ -180,7 +179,6 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 		data: null,
 	});
 });
-
 
 export const AuthController = {
 	registerPatient,

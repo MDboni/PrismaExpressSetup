@@ -31,4 +31,8 @@ export default {
 	redis_host: process.env.REDIS_HOST!,
 	redis_port: process.env.REDIS_PORT!,
 	redis_password: process.env.REDIS_PASSWORD!,
+
+	smtp_user: process.env.SMTP_USER!,
+	email_sender: process.env.EMAIL_SNEDER!,
+	smtp_password: process.env.SMTP_PASSWORD!,
 };

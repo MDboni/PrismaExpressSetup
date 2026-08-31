@@ -23,6 +23,9 @@ import type {
 import { redisClient } from "../../lib/redis";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
+import ejs from "ejs";
+import path from "path/win32";
+import { transporter } from "../../lib/nodemailer";
 
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
@@ -387,7 +390,26 @@ const forgotPassword = async (payload: IForgotPasswordPayload) => {
 			},
 	  });
 
+	  const templatePath = path.join(
+		process.cwd(),
+		"src/app/emailTemplates/forgotPassword.ejs",
+	  )
 
+	  
+	const templateData = {
+		name: isUserExist.name,
+		otp,
+		expirationMinutes: expirationSeconds / 60,
+	};
+
+	  const html = await ejs.renderFile(templatePath, templateData);
+
+	  await transporter.sendMail({
+		from: config.email_sender,
+		to: isUserExist.email,
+		subject: "Forgot Password OTP",
+		html: html,
+	  });
 	  
 
 
@@ -395,6 +417,80 @@ const forgotPassword = async (payload: IForgotPasswordPayload) => {
 
 
 const resetPassword = async (payload: IResetPasswordPayload) => {
+	const { email, otp, newPassword } = payload;
+
+	const isUserExist = await prisma.user.findUnique({
+		where: { email },
+	});
+
+	if (!isUserExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Does Not Exist!");
+	}
+
+	if (isUserExist.status === "BLOCKED") {
+		throw new AppError(httpStatus.FORBIDDEN, "User is Blocked");
+	}
+
+	if (!isUserExist.emailVerified) {
+		throw new AppError(httpStatus.FORBIDDEN, "User Not Verified");
+	}
+
+	if (isUserExist.isDeleted || isUserExist.status === "DELETED") {
+		throw new AppError(httpStatus.FORBIDDEN, "User is Deleted");
+	}
+
+	if (isUserExist.googleId && isUserExist.authProvider === "GOOGLE") {
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"User Has Account With Google",
+		);
+	}
+
+	const key = `forgot-password:${isUserExist.email}`;
+
+	const storedOtp = await redisClient.get(key);
+
+	if (!storedOtp) {
+		throw new AppError(httpStatus.BAD_REQUEST, "OTP has expired or is invalid");
+	}
+
+	if (storedOtp !== otp) {
+		throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP");
+	}
+
+	const hashedNewPassword = await bcrypt.hash(
+		newPassword,
+		Number(config.bcrypt_salt_rounds),
+	);
+
+	await prisma.user.update({
+		where: { 
+			email: isUserExist.email 
+		},
+		data: {
+			password: hashedNewPassword,
+		},
+	});
+
+	await redisClient.del(key);
+
+	const templatePath = path.join(
+		process.cwd(),
+		"src/app/templates/reset-password-success.ejs",
+	);
+
+	const templateData = {
+		name: isUserExist.name,
+	};
+
+	const html = await ejs.renderFile(templatePath, templateData);
+
+	await transporter.sendMail({
+		from: config.email_sender,
+		to: isUserExist.email,
+		subject: "Password Reset Successful",
+		html: html,
+	});
 
 }
 

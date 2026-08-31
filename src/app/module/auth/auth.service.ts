@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/style/useConst: <explanation> */
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import type { TokenPayload } from "google-auth-library";
 import type { JwtPayload, SignOptions } from "jsonwebtoken";
 import {
@@ -15,8 +16,14 @@ import type {
 	IGoogleLoginPayload,
 	ILoginUserPayload,
 	IRegisterPatientPayload,
+	IForgotPasswordPayload,
+	IResetPasswordPayload,
 	IRequestUser,
 } from "./auth.interface";
+import { redisClient } from "../../lib/redis";
+import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status";
+
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
 	const { name, password, patient: patientData } = payload;
@@ -338,10 +345,66 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 	};
 };
 
+const forgotPassword = async (payload: IForgotPasswordPayload) => {
+		const { email } = payload;
+
+		const isUserExist = await prisma.user.findUnique({
+			where: { email },
+		});
+
+		if (!isUserExist) {
+		   throw new AppError(httpStatus.NOT_FOUND, "User Does Not Exist!");
+	    }
+
+		if (isUserExist.status === "BLOCKED") {
+		  throw new AppError(httpStatus.FORBIDDEN, "User is Blocked");
+	    }
+
+
+		if (!isUserExist.emailVerified) {
+		  throw new AppError(httpStatus.FORBIDDEN, "User Not Verified");
+	    }
+
+	   if (isUserExist.isDeleted || isUserExist.status === "DELETED") {
+		  throw new AppError(httpStatus.FORBIDDEN, "User is Deleted");
+	    }
+
+	   if (isUserExist.googleId && isUserExist.authProvider === "GOOGLE") {
+		  throw new AppError(httpStatus.BAD_REQUEST, "User Has Account With Google");
+	    }
+
+	  const otp = crypto.randomInt(100000, 1000000).toString();
+
+	  const key = `forgot-password:${isUserExist.email}`;
+
+	  const expirationSeconds = 5 * 60; // 5 minutes
+
+	  // Store the OTP in Redis with an expiration time
+	  await redisClient.set(key, otp , {
+		    expiration:{
+				type: "EX",
+				value: expirationSeconds,
+			},
+	  });
+
+
+	  
+
+
+}
+
+
+const resetPassword = async (payload: IResetPasswordPayload) => {
+
+}
+
+
 export const AuthService = {
 	registerPatient,
 	loginUser,
 	getMe,
 	refreshToken,
 	googleLogin,
+	forgotPassword,	
+    resetPassword,
 };

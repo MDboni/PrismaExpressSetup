@@ -25,7 +25,7 @@ import { redisClient } from "../../lib/redis";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
 import ejs from "ejs";
-import path from "path/win32";
+import path from "path";
 import { transporter } from "../../lib/nodemailer";
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
@@ -37,58 +37,71 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
 	});
 
 	if (isUserExists) {
-		throw new Error("User with this email already exists");
+		throw new AppError(
+			httpStatus.CONFLICT,
+			"User with this email already exists",
+		);
 	}
 
-	const hashedPassword = await bcrypt.hash(password, 8);
+	const hashedPassword = await bcrypt.hash(
+		password,
+		Number(config.bcrypt_salt_rounds),
+	);
 
-	const createdUser = await prisma.user.create({
-		data: {
-			name,
-			email,
-			password: hashedPassword,
-			role: Role.PATIENT,
-			status: UserStatus.ACTIVE,
-			emailVerified: false,
-			patient: {
-				create: {
-					name,
-					email,
-					contactNumber: patientData.contactNumber,
-					age: patientData.age,
-				},
-			},
+	const otp = crypto.randomInt(100000, 1000000).toString();
+
+	const expirationSeconds = 5 * 60; // 5 minutes
+
+	const otpKey = `patient-registration-otp:${email}`;
+	const patientRegistrationKey = `patient-registration-data:${email}`;
+
+	const registrationData: IRegisterPatientPayload = {
+		name,
+		email,
+		password: hashedPassword,
+		patient: patientData,
+	};
+
+	// Hold the OTP and the pending registration until the email is verified
+	await redisClient.set(otpKey, otp, {
+		expiration: {
+			type: "EX",
+			value: expirationSeconds,
 		},
-		omit: { password: true },
-		include: { patient: true },
 	});
 
-	const { patient, ...user } = createdUser;
-	const jwtPayload = {
-		userId: user.id,
-		name: user.name,
-		email: user.email,
-		role: user.role,
-	};
-
-	const accessToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_access_secret,
-		config.jwt_access_expires_in as SignOptions,
+	await redisClient.set(
+		patientRegistrationKey,
+		JSON.stringify(registrationData),
+		{
+			expiration: {
+				type: "EX",
+				value: expirationSeconds,
+			},
+		},
 	);
 
-	const refreshToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_refresh_secret,
-		config.jwt_refresh_expires_in as SignOptions,
+	const templatePath = path.join(
+		process.cwd(),
+		"src/app/templates/patient-registration-otp.ejs",
 	);
 
-	return {
-		user,
-		patient,
-		accessToken,
-		refreshToken,
+	const templateData = {
+		name,
+		otp,
+		expirationMinutes: expirationSeconds / 60,
 	};
+
+	const html = await ejs.renderFile(templatePath, templateData);
+
+	await transporter.sendMail({
+		from: config.email_sender,
+		to: email,
+		subject: "Verify Your Email",
+		html,
+	});
+
+	return { email };
 };
 
 const verifyPatientEmail = async (payload: IVerifyEmailPayload) => {

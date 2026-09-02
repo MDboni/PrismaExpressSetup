@@ -27,7 +27,6 @@ import ejs from "ejs";
 import path from "path/win32";
 import { transporter } from "../../lib/nodemailer";
 
-
 const registerPatient = async (payload: IRegisterPatientPayload) => {
 	const { name, password, patient: patientData } = payload;
 	const email = payload.email.trim().toLowerCase();
@@ -349,72 +348,66 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
 };
 
 const forgotPassword = async (payload: IForgotPasswordPayload) => {
-		const { email } = payload;
+	const { email } = payload;
 
-		const isUserExist = await prisma.user.findUnique({
-			where: { email },
-		});
+	const isUserExist = await prisma.user.findUnique({
+		where: { email },
+	});
 
-		if (!isUserExist) {
-		   throw new AppError(httpStatus.NOT_FOUND, "User Does Not Exist!");
-	    }
+	if (!isUserExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Does Not Exist!");
+	}
 
-		if (isUserExist.status === "BLOCKED") {
-		  throw new AppError(httpStatus.FORBIDDEN, "User is Blocked");
-	    }
+	if (isUserExist.status === "BLOCKED") {
+		throw new AppError(httpStatus.FORBIDDEN, "User is Blocked");
+	}
 
+	// if (!isUserExist.emailVerified) {
+	// 	throw new AppError(httpStatus.FORBIDDEN, "User Not Verified");
+	// }
 
-		if (!isUserExist.emailVerified) {
-		  throw new AppError(httpStatus.FORBIDDEN, "User Not Verified");
-	    }
+	if (isUserExist.isDeleted || isUserExist.status === "DELETED") {
+		throw new AppError(httpStatus.FORBIDDEN, "User is Deleted");
+	}
 
-	   if (isUserExist.isDeleted || isUserExist.status === "DELETED") {
-		  throw new AppError(httpStatus.FORBIDDEN, "User is Deleted");
-	    }
+	if (isUserExist.googleId && isUserExist.authProvider === "GOOGLE") {
+		throw new AppError(httpStatus.BAD_REQUEST, "User Has Account With Google");
+	}
 
-	   if (isUserExist.googleId && isUserExist.authProvider === "GOOGLE") {
-		  throw new AppError(httpStatus.BAD_REQUEST, "User Has Account With Google");
-	    }
+	const otp = crypto.randomInt(100000, 1000000).toString();
 
-	  const otp = crypto.randomInt(100000, 1000000).toString();
+	const key = `forgot-password:${isUserExist.email}`;
 
-	  const key = `forgot-password:${isUserExist.email}`;
+	const expirationSeconds = 5 * 60; // 5 minutes
 
-	  const expirationSeconds = 5 * 60; // 5 minutes
+	// Store the OTP in Redis with an expiration time
+	await redisClient.set(key, otp, {
+		expiration: {
+			type: "EX",
+			value: expirationSeconds,
+		},
+	});
 
-	  // Store the OTP in Redis with an expiration time
-	  await redisClient.set(key, otp , {
-		    expiration:{
-				type: "EX",
-				value: expirationSeconds,
-			},
-	  });
-
-	  const templatePath = path.join(
+	const templatePath = path.join(
 		process.cwd(),
-		"src/app/emailTemplates/forgotPassword.ejs",
-	  )
+		"src/app/templates/forget-password.ejs",
+	);
 
-	  
 	const templateData = {
 		name: isUserExist.name,
 		otp,
 		expirationMinutes: expirationSeconds / 60,
 	};
 
-	  const html = await ejs.renderFile(templatePath, templateData);
+	const html = await ejs.renderFile(templatePath, templateData);
 
-	  await transporter.sendMail({
+	await transporter.sendMail({
 		from: config.email_sender,
 		to: isUserExist.email,
 		subject: "Forgot Password OTP",
 		html: html,
-	  });
-	  
-
-
-}
-
+	});
+};
 
 const resetPassword = async (payload: IResetPasswordPayload) => {
 	const { email, otp, newPassword } = payload;
@@ -431,19 +424,16 @@ const resetPassword = async (payload: IResetPasswordPayload) => {
 		throw new AppError(httpStatus.FORBIDDEN, "User is Blocked");
 	}
 
-	if (!isUserExist.emailVerified) {
-		throw new AppError(httpStatus.FORBIDDEN, "User Not Verified");
-	}
+	// if (!isUserExist.emailVerified) {
+	// 	throw new AppError(httpStatus.FORBIDDEN, "User Not Verified");
+	// }
 
 	if (isUserExist.isDeleted || isUserExist.status === "DELETED") {
 		throw new AppError(httpStatus.FORBIDDEN, "User is Deleted");
 	}
 
 	if (isUserExist.googleId && isUserExist.authProvider === "GOOGLE") {
-		throw new AppError(
-			httpStatus.BAD_REQUEST,
-			"User Has Account With Google",
-		);
+		throw new AppError(httpStatus.BAD_REQUEST, "User Has Account With Google");
 	}
 
 	const key = `forgot-password:${isUserExist.email}`;
@@ -464,8 +454,8 @@ const resetPassword = async (payload: IResetPasswordPayload) => {
 	);
 
 	await prisma.user.update({
-		where: { 
-			email: isUserExist.email 
+		where: {
+			email: isUserExist.email,
 		},
 		data: {
 			password: hashedNewPassword,
@@ -491,9 +481,7 @@ const resetPassword = async (payload: IResetPasswordPayload) => {
 		subject: "Password Reset Successful",
 		html: html,
 	});
-
-}
-
+};
 
 export const AuthService = {
 	registerPatient,
@@ -501,6 +489,6 @@ export const AuthService = {
 	getMe,
 	refreshToken,
 	googleLogin,
-	forgotPassword,	
-    resetPassword,
+	forgotPassword,
+	resetPassword,
 };

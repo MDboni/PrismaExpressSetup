@@ -35,4 +35,8 @@ export default {
 	smtp_user: process.env.SMTP_USER!,
 	email_sender: process.env.EMAIL_SNEDER!,
 	smtp_password: process.env.SMTP_PASSWORD!,
+
+	coudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+	coudinary_api_key: process.env.CLOUDINARY_API_KEY!,
+	coudinary_api_secret: process.env.CLOUDINARY_API_SECRET!,
 };

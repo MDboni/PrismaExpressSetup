@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type Router as ExpressRouter, Router } from "express";
 import { upload } from "../../lib/multer";
 import { auth } from "../../middleware/checkAuth";
 import { UserController } from "./user.controller";
@@ -13,4 +13,4 @@ router.patch(
 	UserController.uploadProfileImage,
 );
 
-export const UserRoutes = router;
+export const UserRoutes: ExpressRouter = router;

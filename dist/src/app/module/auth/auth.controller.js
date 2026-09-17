@@ -1,10 +1,41 @@
 import httpStatus from "http-status";
+import { AppError } from "../../utils/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { AuthService } from "./auth.service";
 const registerPatient = catchAsync(async (req, res) => {
+    // const payload = PatientValidation.PatientRegistrationZodSchema.safeParse(req.body);
+    // if(!payload.success){
+    // 	console.log(payload.error);
+    // 	console.log(payload.error.issues);
+    // 	throw new Error(payload.error.issues[0].message)
+    // }
+    // console.log(payload);
     const payload = req.body;
-    const result = await AuthService.registerPatient(payload);
+    await AuthService.registerPatient(payload);
+    // const { accessToken, refreshToken, user, patient } = result;
+    // res.cookie("accessToken", accessToken, {
+    // 	httpOnly: true,
+    // 	secure: false,
+    // 	sameSite: "none",
+    // 	maxAge: 1000 * 60 * 60 * 24, // 24 hour or 1 day
+    // });
+    // res.cookie("refreshToken", refreshToken, {
+    // 	httpOnly: true,
+    // 	secure: false,
+    // 	sameSite: "none",
+    // 	maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+    // });
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Verification OTP Sent",
+        data: null,
+    });
+});
+const verifyPatientEmail = catchAsync(async (req, res) => {
+    const payload = req.body;
+    const result = await AuthService.verifyPatientEmail(payload);
     const { accessToken, refreshToken, user, patient } = result;
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -21,7 +52,7 @@ const registerPatient = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
-        message: "Patient registered successfully",
+        message: "Email Verified Successfully",
         data: {
             accessToken,
             refreshToken,
@@ -59,7 +90,7 @@ const loginUser = catchAsync(async (req, res) => {
 const getMe = catchAsync(async (req, res) => {
     const user = req.user;
     if (!user) {
-        throw new Error("User information is missing in the request");
+        throw new AppError(httpStatus.UNAUTHORIZED, "User information is missing in the request");
     }
     const result = await AuthService.getMe(user);
     sendResponse(res, {
@@ -71,7 +102,7 @@ const getMe = catchAsync(async (req, res) => {
 });
 const refreshToken = catchAsync(async (req, res) => {
     if (!req.cookies.refreshToken) {
-        throw new Error("Refresh token is missing");
+        throw new AppError(httpStatus.UNAUTHORIZED, "Refresh token is missing");
     }
     const result = await AuthService.refreshToken(req.cookies.refreshToken);
     const { accessToken, refreshToken: newRefreshToken } = result;
@@ -123,11 +154,34 @@ const googleLogin = catchAsync(async (req, res) => {
         },
     });
 });
+const forgotPassword = catchAsync(async (req, res) => {
+    const payload = req.body;
+    await AuthService.forgotPassword(payload);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: `OTP Sent To Email : ${payload.email}`,
+        data: null,
+    });
+});
+const resetPassword = catchAsync(async (req, res) => {
+    const payload = req.body;
+    await AuthService.resetPassword(payload);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Password Changed Successfully",
+        data: null,
+    });
+});
 export const AuthController = {
     registerPatient,
+    verifyPatientEmail,
     loginUser,
     getMe,
     refreshToken,
     googleLogin,
+    forgotPassword,
+    resetPassword,
 };
 //# sourceMappingURL=auth.controller.js.map

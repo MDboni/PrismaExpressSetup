@@ -27,4 +27,27 @@ export const AuthProvider = {
     GOOGLE: 'GOOGLE',
     CREDENTIAL: 'CREDENTIAL'
 };
+export const AppointmentStatus = {
+    PENDING: 'PENDING',
+    CONFIRMED: 'CONFIRMED',
+    CANCELLED: 'CANCELLED',
+    ONGOING: 'ONGOING',
+    COMPLETED: 'COMPLETED'
+};
+export const PaymentStatus = {
+    UNPAID: 'UNPAID',
+    PAID: 'PAID',
+    FAILED: 'FAILED',
+    CANCELLED: 'CANCELLED',
+    REFUNDED: 'REFUNDED'
+};
+export const DoctorVerificationStatus = {
+    PENDING: 'PENDING',
+    APPROVED: 'APPROVED',
+    REJECTED: 'REJECTED'
+};
+export const ScheduleStatus = {
+    DRAFT: 'DRAFT',
+    PUBLISHED: 'PUBLISHED'
+};
 //# sourceMappingURL=enums.js.map

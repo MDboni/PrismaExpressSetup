@@ -1,14 +1,15 @@
 import type { NextFunction, Request, Response } from "express";
-import { Role } from "../../../prisma/generated/prisma/enums";
+import type { Role } from "../../../prisma/generated/prisma/enums";
+export type RequestUser = {
+    email: string;
+    name: string;
+    userId: string;
+    role: Role;
+};
 declare global {
     namespace Express {
         interface Request {
-            user?: {
-                email: string;
-                name: string;
-                userId: string;
-                role: Role;
-            };
+            user?: RequestUser;
         }
     }
 }

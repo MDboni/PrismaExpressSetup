@@ -11,8 +11,8 @@ export interface PrismaClientConstructor {
    * const prisma = new PrismaClient({
    *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
    * })
-   * // Fetch zero or more Patients
-   * const patients = await prisma.patient.findMany()
+   * // Fetch zero or more Apppointments
+   * const apppointments = await prisma.apppointment.findMany()
    * ```
    *
    * Read more in our [docs](https://pris.ly/d/client).
@@ -30,8 +30,8 @@ export interface PrismaClientConstructor {
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Patients
- * const patients = await prisma.patient.findMany()
+ * // Fetch zero or more Apppointments
+ * const apppointments = await prisma.apppointment.findMany()
  * ```
  *
  * Read more in our [docs](https://pris.ly/d/client).
@@ -118,14 +118,58 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
         extArgs: ExtArgs;
     }>>;
     /**
- * `prisma.patient`: Exposes CRUD operations for the **Patient** model.
+ * `prisma.apppointment`: Exposes CRUD operations for the **Apppointment** model.
   * Example usage:
   * ```ts
-  * // Fetch zero or more Patients
-  * const patients = await prisma.patient.findMany()
+  * // Fetch zero or more Apppointments
+  * const apppointments = await prisma.apppointment.findMany()
   * ```
   */
+    get apppointment(): Prisma.ApppointmentDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.doctor`: Exposes CRUD operations for the **Doctor** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Doctors
+      * const doctors = await prisma.doctor.findMany()
+      * ```
+      */
+    get doctor(): Prisma.DoctorDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.patient`: Exposes CRUD operations for the **Patient** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Patients
+      * const patients = await prisma.patient.findMany()
+      * ```
+      */
     get patient(): Prisma.PatientDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.payment`: Exposes CRUD operations for the **Payment** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Payments
+      * const payments = await prisma.payment.findMany()
+      * ```
+      */
+    get payment(): Prisma.PaymentDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.schedule`: Exposes CRUD operations for the **Schedule** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Schedules
+      * const schedules = await prisma.schedule.findMany()
+      * ```
+      */
+    get schedule(): Prisma.ScheduleDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
     /**

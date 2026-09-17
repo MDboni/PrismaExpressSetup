@@ -22,4 +22,31 @@ export declare const AuthProvider: {
     readonly CREDENTIAL: "CREDENTIAL";
 };
 export type AuthProvider = (typeof AuthProvider)[keyof typeof AuthProvider];
+export declare const AppointmentStatus: {
+    readonly PENDING: "PENDING";
+    readonly CONFIRMED: "CONFIRMED";
+    readonly CANCELLED: "CANCELLED";
+    readonly ONGOING: "ONGOING";
+    readonly COMPLETED: "COMPLETED";
+};
+export type AppointmentStatus = (typeof AppointmentStatus)[keyof typeof AppointmentStatus];
+export declare const PaymentStatus: {
+    readonly UNPAID: "UNPAID";
+    readonly PAID: "PAID";
+    readonly FAILED: "FAILED";
+    readonly CANCELLED: "CANCELLED";
+    readonly REFUNDED: "REFUNDED";
+};
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+export declare const DoctorVerificationStatus: {
+    readonly PENDING: "PENDING";
+    readonly APPROVED: "APPROVED";
+    readonly REJECTED: "REJECTED";
+};
+export type DoctorVerificationStatus = (typeof DoctorVerificationStatus)[keyof typeof DoctorVerificationStatus];
+export declare const ScheduleStatus: {
+    readonly DRAFT: "DRAFT";
+    readonly PUBLISHED: "PUBLISHED";
+};
+export type ScheduleStatus = (typeof ScheduleStatus)[keyof typeof ScheduleStatus];
 //# sourceMappingURL=enums.d.ts.map

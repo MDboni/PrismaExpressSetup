@@ -1,7 +1,8 @@
 import { AuthProvider, Role, UserStatus } from "../../../../prisma/generated/prisma/enums";
-import type { IGoogleLoginPayload, ILoginUserPayload, IRegisterPatientPayload, IRequestUser } from "./auth.interface";
+import type { IGoogleLoginPayload, ILoginUserPayload, IRegisterPatientPayload, IForgotPasswordPayload, IResetPasswordPayload, IRequestUser, IVerifyEmailPayload } from "./auth.interface";
 export declare const AuthService: {
-    registerPatient: (payload: IRegisterPatientPayload) => Promise<{
+    registerPatient: (payload: IRegisterPatientPayload) => Promise<void>;
+    verifyPatientEmail: (payload: IVerifyEmailPayload) => Promise<{
         user: {
             email: string;
             name: string;
@@ -12,6 +13,8 @@ export declare const AuthService: {
             emailVerified: boolean;
             status: UserStatus;
             needPasswordChange: boolean;
+            imageUrl: string;
+            imagePublicId: string;
             isDeleted: boolean;
             deletedAt: Date | null;
             createdAt: Date;
@@ -59,6 +62,8 @@ export declare const AuthService: {
         emailVerified: boolean;
         status: UserStatus;
         needPasswordChange: boolean;
+        imageUrl: string;
+        imagePublicId: string;
         isDeleted: boolean;
         deletedAt: Date | null;
         createdAt: Date;
@@ -72,5 +77,7 @@ export declare const AuthService: {
         accessToken: string;
         refreshToken: string;
     }>;
+    forgotPassword: (payload: IForgotPasswordPayload) => Promise<void>;
+    resetPassword: (payload: IResetPasswordPayload) => Promise<void>;
 };
 //# sourceMappingURL=auth.service.d.ts.map

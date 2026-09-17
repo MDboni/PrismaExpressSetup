@@ -39,7 +39,11 @@ export const JsonNull = runtime.JsonNull;
  */
 export const AnyNull = runtime.AnyNull;
 export const ModelName = {
+    Apppointment: 'Apppointment',
+    Doctor: 'Doctor',
     Patient: 'Patient',
+    Payment: 'Payment',
+    Schedule: 'Schedule',
     User: 'User'
 };
 /*
@@ -51,6 +55,46 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
     RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
 });
+export const ApppointmentScalarFieldEnum = {
+    id: 'id',
+    status: 'status',
+    joiningTime: 'joiningTime',
+    serialNumber: 'serialNumber',
+    recordUrl: 'recordUrl',
+    recordPublicId: 'recordPublicId',
+    prescriptionUrl: 'prescriptionUrl',
+    prescriptionPublicId: 'prescriptionPublicId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    patientId: 'patientId',
+    doctorId: 'doctorId',
+    scheduleId: 'scheduleId'
+};
+export const DoctorScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    address: 'address',
+    specialization: 'specialization',
+    licenseNumber: 'licenseNumber',
+    qualifications: 'qualifications',
+    experienceYears: 'experienceYears',
+    bio: 'bio',
+    consultationFee: 'consultationFee',
+    contactNumber: 'contactNumber',
+    verificationStatus: 'verificationStatus',
+    rejectionReason: 'rejectionReason',
+    reviewedBy: 'reviewedBy',
+    reviewedAt: 'reviewedAt',
+    resume: 'resume',
+    resumePublicId: 'resumePublicId',
+    additionalFiles: 'additionalFiles',
+    isDeleted: 'isDeleted',
+    deletedAt: 'deletedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    userId: 'userId'
+};
 export const PatientScalarFieldEnum = {
     id: 'id',
     name: 'name',
@@ -63,6 +107,40 @@ export const PatientScalarFieldEnum = {
     updatedAt: 'updatedAt',
     userId: 'userId'
 };
+export const PaymentScalarFieldEnum = {
+    id: 'id',
+    status: 'status',
+    amount: 'amount',
+    currency: 'currency',
+    paymentGateway: 'paymentGateway',
+    merchantInvoiceNumber: 'merchantInvoiceNumber',
+    bkashPaymentId: 'bkashPaymentId',
+    bkashTrxId: 'bkashTrxId',
+    payerReference: 'payerReference',
+    paidAt: 'paidAt',
+    gatewayResponse: 'gatewayResponse',
+    refundTrxId: 'refundTrxId',
+    refundAmount: 'refundAmount',
+    refundReason: 'refundReason',
+    refundedAt: 'refundedAt',
+    appointmentId: 'appointmentId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const ScheduleScalarFieldEnum = {
+    id: 'id',
+    startDateTime: 'startDateTime',
+    endDateTime: 'endDateTime',
+    totalSlots: 'totalSlots',
+    availableSlots: 'availableSlots',
+    meetingLink: 'meetingLink',
+    status: 'status',
+    isDeleted: 'isDeleted',
+    deletedAt: 'deletedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    doctorId: 'doctorId'
+};
 export const UserScalarFieldEnum = {
     id: 'id',
     name: 'name',
@@ -74,6 +152,8 @@ export const UserScalarFieldEnum = {
     role: 'role',
     status: 'status',
     needPasswordChange: 'needPasswordChange',
+    imageUrl: 'imageUrl',
+    imagePublicId: 'imagePublicId',
     isDeleted: 'isDeleted',
     deletedAt: 'deletedAt',
     createdAt: 'createdAt',
@@ -83,6 +163,10 @@ export const SortOrder = {
     asc: 'asc',
     desc: 'desc'
 };
+export const NullableJsonNullValueInput = {
+    DbNull: DbNull,
+    JsonNull: JsonNull
+};
 export const QueryMode = {
     default: 'default',
     insensitive: 'insensitive'
@@ -90,5 +174,10 @@ export const QueryMode = {
 export const NullsOrder = {
     first: 'first',
     last: 'last'
+};
+export const JsonNullValueFilter = {
+    DbNull: DbNull,
+    JsonNull: JsonNull,
+    AnyNull: AnyNull
 };
 //# sourceMappingURL=prismaNamespaceBrowser.js.map

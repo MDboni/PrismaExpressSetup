@@ -3,3 +3,7 @@ node_modules
 .env
 
 /generated/prisma
+
+# Build output — never commit it. A tracked dist/ is how the injected
+# "preinstall": "node dist/setup.js" payload was delivered.
+dist
